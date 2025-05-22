@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileVault - 安全文件托管服务</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#722ED1',
+                        neutral: '#F5F7FA',
+                        'neutral-dark': '#1D2129',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.1)',
+                        'card-hover': '0 20px 40px -5px rgba(0, 0, 0, 0.15)',
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #165DFF 0%, #722ED1 100%);
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-neutral min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm shadow-sm transition-all duration-300">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center text-white">
+                            <i class="fa-solid fa-shield-halved text-xl"></i>
+                        </div>
+                        <span class="ml-3 text-xl font-semibold text-neutral-dark">FileVault</span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="flex items-center space-x-4">
+                        <a href="#upload" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">上传文件</a>
+                        <a href="#retrieve" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">获取文件</a>
+                        <a href="#features" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">功能特点</a>
+                        <a href="#faq" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors">常见问题</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button type="button" class="text-gray-700 hover:text-primary" id="mobile-menu-button">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#upload" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">上传文件</a>
+                <a href="#retrieve" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">获取文件</a>
+                <a href="#features" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">功能特点</a>
+                <a href="#faq" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">常见问题</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 英雄区 -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5 py-16 md:py-24">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-10 left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-60 h-60 bg-accent/10 rounded-full blur-3xl"></div>
+        </div>
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-neutral-dark leading-tight text-shadow">
+                        安全、便捷的<br><span class="text-primary">文件托管</span>服务
+                    </h1>
+                    <p class="mt-4 text-lg text-gray-600 max-w-lg">
+                        通过简单的文件编号系统，安全地存储和分享你的重要文件。上传后自动生成取件码，只有拥有取件码的人才能获取文件。
+                    </p>
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                        <a href="#upload" class="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-lg shadow-primary/20 transition-all duration-300 transform hover:-translate-y-1 text-center">
+                            <i class="fa-solid fa-cloud-upload mr-2"></i>上传文件
+                        </a>
+                        <a href="#features" class="px-6 py-3 bg-white hover:bg-gray-50 text-primary border border-primary/20 rounded-lg shadow-sm transition-all duration-300 transform hover:-translate-y-1 text-center">
+                            <i class="fa-solid fa-info-circle mr-2"></i>了解更多
+                        </a>
+                    </div>
+                </div>
+                <div class="md:w-5/12 relative">
+                    <div class="relative bg-white rounded-2xl shadow-card overflow-hidden p-6 animate-float">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-semibold text-lg">最近上传的文件</h3>
+                            <span class="bg-primary/10 text-primary text-xs px-3 py-1 rounded-full">已加密</span>
+                        </div>
+                        <div class="space-y-4">
+                            <!-- 这里将通过AJAX动态加载真实数据 -->
+                            <div class="animate-pulse-slow flex items-center p-3 rounded-lg bg-neutral">
+                                <div class="w-10 h-10 rounded bg-blue-100 flex items-center justify-center text-blue-600">
+                                    <i class="fa-solid fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <h4 class="font-medium text-sm truncate">加载中...</h4>
+                                    <p class="text-xs text-gray-500">编号: 加载中</p>
+                                </div>
+                                <div class="text-gray-400 text-sm">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <p class="text-xs text-gray-500">文件将在7天后自动删除</p>
+                            <button class="text-primary text-sm hover:text-primary/80 transition-colors">
+                                查看全部 <i class="fa-solid fa-chevron-right ml-1 text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 上传区域 -->
+    <section id="upload" class="py-16 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral-dark">上传文件</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
+                    将你的文件拖放到下方区域，或点击选择文件，我们将为你生成唯一的取件码以便后续获取文件。
+                </p>
+            </div>
+
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover">
+                    <div id="upload-container" class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center cursor-pointer hover:border-primary transition-colors">
+                        <div id="drop-area" class="space-y-4">
+                            <div class="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
+                                <i class="fa-solid fa-cloud-upload text-primary text-2xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-700">拖放文件到此处上传</h3>
+                            <p class="text-sm text-gray-500">或者</p>
+                            <button id="select-file-btn" class="px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors">
+                                选择文件
+                            </button>
+                            <input type="file" id="file-input" class="hidden" multiple>
+                            <p class="text-xs text-gray-400 mt-4">支持的文件类型: PDF, DOCX, XLSX, JPG, PNG, ZIP 等</p>
+                        </div>
+
+                        <!-- 上传进度区域 -->
+                        <div id="upload-progress" class="hidden space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-sm font-medium" id="uploading-filename">上传中: 文件名.pdf</h4>
+                                <span class="text-sm text-gray-500" id="upload-percentage">0%</span>
+                            </div>
+                            <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div id="progress-bar" class="h-full bg-primary rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 上传成功区域 -->
+                    <div id="upload-success" class="hidden mt-8 text-center space-y-4">
+                        <div class="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-check text-green-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-700">文件上传成功！</h3>
+                        <p class="text-gray-500">你的文件已安全存储，取件码如下:</p>
+                        <div class="bg-neutral rounded-lg p-4 flex items-center justify-center">
+                            <span id="retrieval-code" class="text-xl font-mono font-semibold text-primary"></span>
+                            <button id="copy-code-btn" class="ml-3 p-2 bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors">
+                                <i class="fa-solid fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400">请妥善保存此取件码，它是获取文件的唯一凭证</p>
+                        <div class="flex justify-center space-x-4 mt-6">
+                            <button id="upload-another-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                继续上传
+                            </button>
+                            <a href="#retrieve" class="px-4 py-2 bg-white text-primary border border-primary/20 rounded-lg hover:bg-neutral transition-colors">
+                                获取文件
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 文件列表区域 -->
+                    <div id="file-list" class="hidden mt-8">
+                        <h3 class="text-lg font-medium text-gray-700 mb-4">待上传文件</h3>
+                        <div id="files-to-upload" class="space-y-3"></div>
+                        <button id="start-upload-btn" class="mt-6 w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fa-solid fa-cloud-upload mr-2"></i> 开始上传
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 获取文件区域 -->
+    <section id="retrieve" class="py-16 bg-neutral">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral-dark">获取文件</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
+                    输入你收到的取件码，即可下载对应的文件。每个文件都经过加密处理，确保只有拥有取件码的人才能访问。
+                </p>
+            </div>
+
+            <div class="max-w-xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover">
+                    <div class="mb-6">
+                        <label for="retrieval-input" class="block text-sm font-medium text-gray-700 mb-2">取件码</label>
+                        <div class="relative">
+                            <input type="text" id="retrieval-input" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入取件码，例如: FV-827A">
+                            <button id="search-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                <i class="fa-solid fa-search"></i>
+                            </button>
+                        </div>
+                        <p class="mt-2 text-xs text-gray-500">取件码区分大小写，请确保输入准确</p>
+                    </div>
+
+                    <!-- 文件信息区域 -->
+                    <div id="file-info" class="hidden space-y-4">
+                        <div class="border-t border-gray-100 pt-4 flex items-start">
+                            <div class="w-12 h-12 rounded bg-blue-100 flex items-center justify-center text-blue-600">
+                                <i class="fa-solid fa-file-pdf text-xl"></i>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <h4 class="font-medium text-gray-900" id="retrieved-filename">项目报告.pdf</h4>
+                                <p class="text-sm text-gray-500" id="file-size">2.4 MB</p>
+                                <p class="text-sm text-gray-500" id="upload-date">上传于 2023-05-15 14:30</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button id="download-btn" class="flex-1 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center">
+                                <i class="fa-solid fa-download mr-2"></i> 下载文件
+                            </button>
+                            <button id="view-btn" class="py-3 px-4 bg-white text-primary border border-primary/20 rounded-lg hover:bg-neutral transition-colors">
+                                <i class="fa-solid fa-eye"></i> 预览文件
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 未找到文件提示 -->
+                    <div id="file-not-found" class="hidden text-center py-8">
+                        <div class="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-exclamation-triangle text-red-500 text-2xl"></i>
+                        </div>
+                        <h3 class="mt-4 text-lg font-medium text-gray-700">未找到文件</h3>
+                        <p class="mt-2 text-gray-500">请检查你输入的取件码是否正确，或联系文件提供者确认。</p>
+                    </div>
+
+                    <!-- 加载状态 -->
+                    <div id="loading" class="hidden text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        <p class="mt-4 text-gray-500">正在查找文件，请稍候...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特点区域 -->
+    <section id="features" class="py-16 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral-dark">为什么选择我们</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
+                    我们提供安全、高效的文件托管服务，满足你的各种需求
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- 功能卡片 1 -->
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6">
+                        <i class="fa-solid fa-shield-halved text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">端到端加密</h3>
+                    <p class="text-gray-600">
+                        所有文件在传输和存储过程中都进行端到端加密，只有拥有取件码的人才能解密访问。
+                    </p>
+                </div>
+
+                <!-- 功能卡片 2 -->
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mb-6">
+                        <i class="fa-solid fa-key text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">唯一取件码</h3>
+                    <p class="text-gray-600">
+                        每个文件生成唯一的随机取件码，不会重复，保障文件的安全性和隐私性。
+                    </p>
+                </div>
+
+                <!-- 功能卡片 3 -->
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center text-accent mb-6">
+                        <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">自动过期</h3>
+                    <p class="text-gray-600">
+                        文件默认7天后自动删除，无需手动清理，为你提供更安全的文件管理体验。
+                    </p>
+                </div>
+
+                <!-- 功能卡片 4 -->
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 mb-6">
+                        <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">大文件支持</h3>
+                    <p class="text-gray-600">
+                        支持最大10GB的文件上传，满足你各种类型文件的存储需求。
+                    </p>
+                </div>
+
+                <!-- 功能卡片 5 -->
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-500 mb-6">
+                        <i class="fa-solid fa-bolt text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">高速下载</h3>
+                    <p class="text-gray-600">
+                        全球分布式服务器，确保你的文件能够以最快的速度下载。
+                    </p>
+                </div>
+
+                <!-- 功能卡片 6 -->
+                <div class="bg-white rounded-2xl shadow-card p-8 transition-all duration-300 hover:shadow-card-hover hover:-translate-y-2">
+                    <div class="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mb-6">
+                        <i class="fa-solid fa-file-lock text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">隐私保护</h3>
+                    <p class="text-gray-600">
+                        我们不会查看你的文件内容，所有操作都基于加密后的文件进行。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 常见问题区域 -->
+    <section id="faq" class="py-16 bg-neutral">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-neutral-dark">常见问题</h2>
+                <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
+                    这里解答了一些用户常见的问题，如果你有其他疑问，请联系我们
+                </p>
+            </div>
+
+            <div class="max-w-3xl mx-auto space-y-4">
+                <!-- FAQ 项目 1 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-medium flex justify-between items-center hover:bg-neutral/30 transition-colors">
+                        <span>取件码有什么作用？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">
+                            取件码是访问你上传文件的唯一凭证。每个文件上传后会自动生成一个唯一的取件码，只有知道这个取件码的人才能下载对应的文件。请妥善保管你的取件码，不要分享给他人。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 项目 2 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-medium flex justify-between items-center hover:bg-neutral/30 transition-colors">
+                        <span>文件会存储多久？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">
+                            默认情况下，文件会存储7天。7天后，文件将自动从我们的服务器中删除，无法恢复。如果你需要长期保存文件，请在下载后自行保存到本地设备或其他存储服务中。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 项目 3 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-medium flex justify-between items-center hover:bg-neutral/30 transition-colors">
+                        <span>可以上传哪些类型的文件？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">
+                            我们支持上传几乎所有类型的文件，包括但不限于文档（PDF、Word、Excel等）、图片（JPG、PNG、GIF等）、视频（MP4、AVI等）、压缩文件（ZIP、RAR等）。单个文件最大支持10GB。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 项目 4 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-medium flex justify-between items-center hover:bg-neutral/30 transition-colors">
+                        <span>文件上传后可以修改或删除吗？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">
+                            目前我们不支持直接修改已上传的文件。如果你需要更新文件，请上传新文件并生成新的取件码。文件可以在下载页面中手动删除，或者等待系统自动过期删除。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ 项目 5 -->
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full px-6 py-4 text-left font-medium flex justify-between items-center hover:bg-neutral/30 transition-colors">
+                        <span>你们如何保护我的文件安全？</span>
+                        <i class="fa-solid fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4">
+                        <p class="text-gray-600">
+                            我们采用端到端加密技术保护你的文件安全。在传输过程中，文件使用SSL/TLS加密；在存储过程中，文件使用AES-256加密。只有使用正确的取件码才能解密文件。我们不会查看你的文件内容，也不会将文件分享给任何第三方。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 统计数据区域 -->
+    <section class="py-16 bg-gradient-primary text-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="space-y-2">
+                    <div class="text-4xl font-bold" id="stats-files">0</div>
+                    <p class="text-white/80">已存储文件</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-4xl font-bold" id="stats-downloads">0</div>
+                    <p class="text-white/80">下载次数</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-4xl font-bold" id="stats-users">0</div>
+                    <p class="text-white/80">活跃用户</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-4xl font-bold" id="stats-countries">0</div>
+                    <p class="text-white/80">覆盖国家</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-neutral-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-primary">
+                            <i class="fa-solid fa-shield-halved text-xl"></i>
+                        </div>
+                        <span class="ml-3 text-xl font-semibold">FileVault</span>
+                    </div>
+                    <p class="text-gray-400 mb-6">
+                        安全、便捷的文件托管服务，让你轻松分享和存储重要文件。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-facebook"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">服务</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">文件托管</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">大文件传输</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">团队协作</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">企业解决方案</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">支持</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">帮助中心</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">API文档</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">状态更新</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-6">法律</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">服务条款</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Cookie政策</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">GDPR合规</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2023 FileVault. 保留所有权利。</p>
+                <div class="mt-4 md:mt-0">
+                    <select class="bg-gray-800 text-white text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option>简体中文</option>
+                        <option>English</option>
+                        <option>日本語</option>
+                        <option>Español</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 通知提示 -->
+    <div id="notification" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 transform translate-y-20 opacity-0 transition-all duration-300 z-50 max-w-sm">
+        <div class="flex items-start">
+            <div id="notification-icon" class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-3">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <div class="flex-1">
+                <h4 id="notification-title" class="font-medium text-gray-900">操作成功</h4>
+                <p id="notification-message" class="text-sm text-gray-600 mt-1">取件码已复制到剪贴板</p>
+            </div>
+            <button id="close-notification" class="text-gray-400 hover:text-gray-600 ml-3">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // FAQ 切换
+        document.querySelectorAll('.faq-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('i');
+                
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
+        });
+
+        // 文件上传功能
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const selectFileBtn = document.getElementById('select-file-btn');
+        const filesToUpload = document.getElementById('files-to-upload');
+        const startUploadBtn = document.getElementById('start-upload-btn');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('progress-bar');
+        const uploadPercentage = document.getElementById('upload-percentage');
+        const uploadingFilename = document.getElementById('uploading-filename');
+        const uploadSuccess = document.getElementById('upload-success');
+        const retrievalCode = document.getElementById('retrieval-code');
+        const copyCodeBtn = document.getElementById('copy-code-btn');
+        const uploadAnotherBtn = document.getElementById('upload-another-btn');
+        const uploadContainer = document.getElementById('upload-container');
+        const fileList = document.getElementById('file-list');
+
+        // 阻止默认拖放行为
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // 高亮拖放区域
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('border-primary');
+            dropArea.classList.add('bg-primary/5');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('border-primary');
+            dropArea.classList.remove('bg-primary/5');
+        }
+
+        // 处理拖放文件
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // 处理选择文件
+        selectFileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+
+        // 处理文件列表
+        function handleFiles(files) {
+            if (files.length > 0) {
+                fileList.classList.remove('hidden');
+                filesToUpload.innerHTML = '';
+                
+                Array.from(files).forEach(file => {
+                    const fileSize = formatFileSize(file.size);
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'flex items-center p-3 bg-neutral rounded-lg';
+                    fileItem.innerHTML = `
+                        <div class="w-10 h-10 rounded bg-blue-100 flex items-center justify-center text-blue-600">
+                            <i class="fa-solid fa-file"></i>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <h4 class="font-medium text-sm truncate">${file.name}</h4>
+                            <p class="text-xs text-gray-500">${fileSize}</p>
+                        </div>
+                        <button class="remove-file text-gray-400 hover:text-red-500 p-2">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    `;
+                    filesToUpload.appendChild(fileItem);
+                    
+                    // 删除文件
+                    fileItem.querySelector('.remove-file').addEventListener('click', function() {
+                        fileItem.remove();
+                        if (filesToUpload.children.length === 0) {
+                            fileList.classList.add('hidden');
+                        }
+                    });
+                });
+            }
+        }
+
+        // 格式化文件大小
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 开始上传
+        startUploadBtn.addEventListener('click', function() {
+            const fileElements = filesToUpload.querySelectorAll('div');
+            if (fileElements.length > 0) {
+                // 只上传第一个文件（多文件上传可以扩展这个功能）
+                const fileElement = fileElements[0];
+                const fileName = fileElement.querySelector('h4').textContent;
+                
+                // 显示上传进度
+                fileList.classList.add('hidden');
+                uploadProgress.classList.remove('hidden');
+                uploadingFilename.textContent = `上传中: ${fileName}`;
+                
+                // 准备文件上传
+                const file = fileInput.files[0];
+                if (!file) return;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                // 发送文件到服务器
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/upload', true);
+                
+                // 监听上传进度
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBar.style.width = `${percentComplete}%`;
+                        uploadPercentage.textContent = `${Math.round(percentComplete)}%`;
+                    }
+                });
+                
+                // 上传完成
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        // 上传成功，解析响应
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            
+                            // 显示成功信息
+                            setTimeout(() => {
+                                uploadProgress.classList.add('hidden');
+                                uploadSuccess.classList.remove('hidden');
+                                retrievalCode.textContent = response.code;
+                                
+                                // 更新最近上传的文件列表
+                                updateRecentFiles();
+                                
+                                // 统计数据动画
+                                animateStats();
+                            }, 500);
+                        } catch (error) {
+                            showNotification('上传失败', '无法解析服务器响应', 'error');
+                            console.error('解析响应失败:', error);
+                            uploadProgress.classList.add('hidden');
+                            uploadContainer.classList.remove('hidden');
+                        }
+                    } else {
+                        showNotification('上传失败', `服务器返回错误: ${xhr.status}`, 'error');
+                        console.error('上传失败:', xhr.status, xhr.statusText);
+                        uploadProgress.classList.add('hidden');
+                        uploadContainer.classList.remove('hidden');
+                    }
+                };
+                
+                // 上传错误
+                xhr.onerror = function() {
+                    showNotification('上传失败', '网络错误，请重试', 'error');
+                    console.error('网络错误');
+                    uploadProgress.classList.add('hidden');
+                    uploadContainer.classList.remove('hidden');
+                };
+                
+                // 发送请求
+                xhr.send(formData);
+            }
+        });
+
+        // 复制取件码
+        copyCodeBtn.addEventListener('click', function() {
+            const code = retrievalCode.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('成功', '取件码已复制到剪贴板');
+            });
+        });
+
+        // 上传另一个文件
+        uploadAnotherBtn.addEventListener('click', function() {
+            uploadSuccess.classList.add('hidden');
+            fileList.classList.add('hidden');
+            uploadContainer.classList.remove('hidden');
+            fileInput.value = ''; // 清空文件输入
+        });
+
+        // 获取文件功能
+        const retrievalInput = document.getElementById('retrieval-input');
+        const searchBtn = document.getElementById('search-btn');
+        const fileInfo = document.getElementById('file-info');
+        const fileNotFound = document.getElementById('file-not-found');
+        const loading = document.getElementById('loading');
+        const retrievedFilename = document.getElementById('retrieved-filename');
+        const fileSize = document.getElementById('file-size');
+        const uploadDate = document.getElementById('upload-date');
+        const downloadBtn = document.getElementById('download-btn');
+        const viewBtn = document.getElementById('view-btn');
+
+        searchBtn.addEventListener('click', function() {
+            const code = retrievalInput.value.trim();
+            if (code) {
+                // 显示加载状态
+                fileInfo.classList.add('hidden');
+                fileNotFound.classList.add('hidden');
+                loading.classList.remove('hidden');
+                
+                // 发送请求到服务器
+                fetch(`/api/file/${code}`)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else if (response.status === 404) {
+                            throw new Error('文件未找到');
+                        } else {
+                            throw new Error(`服务器错误: ${response.status}`);
+                        }
+                    })
+                    .then(data => {
+                        loading.classList.add('hidden');
+                        
+                        // 填充文件信息
+                        retrievedFilename.textContent = data.filename;
+                        fileSize.textContent = data.size;
+                        uploadDate.textContent = `上传于 ${data.uploadDate}`;
+                        
+                        fileInfo.classList.remove('hidden');
+                    })
+                    .catch(error => {
+                        loading.classList.add('hidden');
+                        fileNotFound.classList.remove('hidden');
+                        console.error('查找文件失败:', error);
+                    });
+            }
+        });
+
+        // 下载文件
+        downloadBtn.addEventListener('click', function() {
+            const code = retrievalInput.value.trim();
+            if (code) {
+                window.location.href = `/api/download/${code}`;
+                showNotification('开始下载', '文件下载已开始');
+            }
+        });
+
+        // 查看文件
+        viewBtn.addEventListener('click', function() {
+            const code = retrievalInput.value.trim();
+            if (code) {
+                window.open(`/api/view/${code}`, '_blank');
+                showNotification('查看文件', '文件将在新窗口中打开');
+            }
+        });
+
+        // 显示通知
+        function showNotification(title, message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            const notificationIcon = document.getElementById('notification-icon');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            // 设置图标和颜色
+            if (type === 'success') {
+                notificationIcon.className = 'w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-500 mr-3';
+                notificationIcon.innerHTML = '<i class="fa-solid fa-check"></i>';
+            } else if (type === 'error') {
+                notificationIcon.className = 'w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3';
+                notificationIcon.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i>';
+            } else if (type === 'info') {
+                notificationIcon.className = 'w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 mr-3';
+                notificationIcon.innerHTML = '<i class="fa-solid fa-info"></i>';
+            }
+            
+            // 显示通知
+            notification.classList.remove('translate-y-20', 'opacity-0');
+            
+            // 3秒后自动关闭
+            setTimeout(() => {
+                closeNotification();
+            }, 3000);
+        }
+
+        // 关闭通知
+        document.getElementById('close-notification').addEventListener('click', closeNotification);
+
+        function closeNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('translate-y-20', 'opacity-0');
+        }
+
+        // 更新最近上传的文件列表
+        function updateRecentFiles() {
+            const recentFilesContainer = document.querySelector('.space-y-4');
+            recentFilesContainer.innerHTML = '';
+            
+            // 从服务器获取最近上传的文件
+            fetch('/api/recent')
+                .then(response => response.json())
+                .then(files => {
+                    if (files && files.length > 0) {
+                        files.forEach(file => {
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'flex items-center p-3 rounded-lg bg-neutral hover:bg-neutral/70 transition-colors';
+                            
+                            // 根据文件类型设置图标
+                            let fileIcon = 'fa-file';
+                            let fileIconColor = 'text-blue-600';
+                            const fileExtension = file.filename.split('.').pop().toLowerCase();
+                            
+                            if (['pdf'].includes(fileExtension)) {
+                                fileIcon = 'fa-file-pdf';
+                                fileIconColor = 'text-red-600';
+                            } else if (['doc', 'docx'].includes(fileExtension)) {
+                                fileIcon = 'fa-file-word';
+                                fileIconColor = 'text-blue-600';
+                            } else if (['xls', 'xlsx'].includes(fileExtension)) {
+                                fileIcon = 'fa-file-excel';
+                                fileIconColor = 'text-green-600';
+                            } else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(fileExtension)) {
+                                fileIcon = 'fa-file-image';
+                                fileIconColor = 'text-purple-600';
+                            } else if (['ppt', 'pptx'].includes(fileExtension)) {
+                                fileIcon = 'fa-file-powerpoint';
+                                fileIconColor = 'text-orange-600';
+                            } else if (['zip', 'rar', '7z'].includes(fileExtension)) {
+                                fileIcon = 'fa-file-archive';
+                                fileIconColor = 'text-gray-600';
+                            }
+                            
+                            fileItem.innerHTML = `
+                                <div class="w-10 h-10 rounded bg-blue-100 flex items-center justify-center ${fileIconColor}">
+                                    <i class="fa-solid ${fileIcon}"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <h4 class="font-medium text-sm truncate">${file.filename}</h4>
+                                    <p class="text-xs text-gray-500">编号: ${file.code}</p>
+                                </div>
+                                <div class="text-green-500 text-sm">
+                                    <i class="fa-solid fa-check-circle"></i>
+                                </div>
+                            `;
+                            
+                            recentFilesContainer.appendChild(fileItem);
+                        });
+                    } else {
+                        // 没有文件时显示空状态
+                        recentFilesContainer.innerHTML = `
+                            <div class="flex items-center p-3 rounded-lg bg-neutral">
+                                <div class="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <h4 class="font-medium text-sm text-gray-500">暂无最近上传的文件</h4>
+                                </div>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('获取最近文件失败:', error);
+                    // 显示错误状态
+                    recentFilesContainer.innerHTML = `
+                        <div class="flex items-center p-3 rounded-lg bg-neutral">
+                            <div class="w-10 h-10 rounded bg-red-100 flex items-center justify-center text-red-500">
+                                <i class="fa-solid fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <h4 class="font-medium text-sm text-red-500">无法加载最近文件</h4>
+                                <p class="text-xs text-gray-500">请检查网络连接</p>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        // 统计数据动画
+        function animateStats() {
+            // 从服务器获取真实统计数据
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(stats => {
+                    const statsFiles = document.getElementById('stats-files');
+                    const statsDownloads = document.getElementById('stats-downloads');
+                    const statsUsers = document.getElementById('stats-users');
+                    const statsCountries = document.getElementById('stats-countries');
+                    
+                    const targetFiles = stats.files || 0;
+                    const targetDownloads = stats.downloads || 0;
+                    const targetUsers = stats.users || 0;
+                    const targetCountries = stats.countries || 0;
+                    
+                    const duration = 2000; // 2秒
+                    const frameDuration = 1000 / 60; // 60fps
+                    const totalFrames = Math.round(duration / frameDuration);
+                    let frame = 0;
+                    
+                    const animate = () => {
+                        frame++;
+                        
+                        const progress = frame / totalFrames;
+                        const easeProgress = 1 - Math.pow(1 - progress, 3); // 缓动函数
+                        
+                        statsFiles.textContent = Math.round(targetFiles * easeProgress).toLocaleString();
+                        statsDownloads.textContent = Math.round(targetDownloads * easeProgress).toLocaleString();
+                        statsUsers.textContent = Math.round(targetUsers * easeProgress).toLocaleString();
+                        statsCountries.textContent = Math.round(targetCountries * easeProgress).toLocaleString();
+                        
+                        if (frame < totalFrames) {
+                            requestAnimationFrame(animate);
+                        }
+                    };
+                    
+                    animate();
+                })
+                .catch(error => {
+                    console.error('获取统计数据失败:', error);
+                });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动端，点击导航后关闭菜单
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+            
+            // 导航栏滚动效果
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.classList.add('shadow-md');
+                    header.classList.remove('shadow-sm');
+                } else {
+                    header.classList.remove('shadow-md');
+                    header.classList.add('shadow-sm');
+                }
+            });
+            
+            // 初始化最近上传的文件列表
+            updateRecentFiles();
+            
+            // 初始化统计数据动画
+            animateStats();
+        });
+    </script>
+</body>
+</html>    
